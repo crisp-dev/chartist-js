@@ -298,6 +298,20 @@
           labelAxisValueIndex = valueIndex;
         }
 
+        // Skip zero values
+        if(options.skipZeroValues && seriesIndex > 0) {
+          var skipIndex = 0;
+
+          for (var i = seriesIndex - 1; i >= 0; i--) {
+            if (data.normalized.series[i][valueIndex].y === 0) {
+              skipIndex += 1;
+            }
+          }
+
+          // Update bi-polar value according to the number of zero-values before the current value
+          biPol = (seriesIndex - skipIndex) - (data.raw.series.length - 1) / 2;
+        }
+
         // We need to transform coordinates differently based on the chart layout
         if(options.horizontalBars) {
           projected = {
@@ -357,27 +371,29 @@
         positions.y1 = Math.min(Math.max(positions.y1, chartRect.y2), chartRect.y1);
         positions.y2 = Math.min(Math.max(positions.y2, chartRect.y2), chartRect.y1);
 
-        var metaData = Chartist.getMetaData(series, valueIndex);
+        if(!(options.skipZeroValues && value.y === 0)) {
+          var metaData = Chartist.getMetaData(series, valueIndex);
 
-        // Create bar element
-        bar = seriesElement.elem('line', positions, options.classNames.bar).attr({
-          'ct:value': [value.x, value.y].filter(Chartist.isNumeric).join(','),
-          'ct:meta': Chartist.serialize(metaData)
-        });
+          // Create bar element
+          bar = seriesElement.elem('line', positions, options.classNames.bar).attr({
+            'ct:value': [value.x, value.y].filter(Chartist.isNumeric).join(','),
+            'ct:meta': Chartist.serialize(metaData)
+          });
 
-        this.eventEmitter.emit('draw', Chartist.extend({
-          type: 'bar',
-          value: value,
-          index: valueIndex,
-          meta: metaData,
-          series: series,
-          seriesIndex: seriesIndex,
-          axisX: axisX,
-          axisY: axisY,
-          chartRect: chartRect,
-          group: seriesElement,
-          element: bar
-        }, positions));
+          this.eventEmitter.emit('draw', Chartist.extend({
+            type: 'bar',
+            value: value,
+            index: valueIndex,
+            meta: metaData,
+            series: series,
+            seriesIndex: seriesIndex,
+            axisX: axisX,
+            axisY: axisY,
+            chartRect: chartRect,
+            group: seriesElement,
+            element: bar
+          }, positions));
+        }
       }.bind(this));
     }.bind(this));
 
