@@ -299,17 +299,26 @@
         }
 
         // Skip zero values
-        if(options.skipZeroValues && seriesIndex > 0) {
+        if(options.skipZeroValues) {
           var skipIndex = 0;
+          var nonZeroValuesSeriesLength = 0;
 
+          // Count the number of zero-values before the current value index
           for (var i = seriesIndex - 1; i >= 0; i--) {
             if (data.normalized.series[i][valueIndex].y === 0) {
               skipIndex += 1;
             }
           }
 
-          // Update bi-polar value according to the number of zero-values before the current value
-          biPol = (seriesIndex - skipIndex) - (data.raw.series.length - 1) / 2;
+          // Count the number of series that have non-zero-values, for the current value index
+          for (var j = 0; j < data.raw.series.length; j++) {
+            if (data.normalized.series[j][valueIndex].y > 0) {
+              nonZeroValuesSeriesLength += 1;
+            }
+          }
+
+          // Update bi-polar value
+          biPol = (seriesIndex - skipIndex) - (nonZeroValuesSeriesLength - 1) / 2;
         }
 
         // We need to transform coordinates differently based on the chart layout
