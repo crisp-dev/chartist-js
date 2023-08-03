@@ -80,7 +80,7 @@
     "start": "./node_modules/.bin/grunt",
     "test": "./node_modules/.bin/grunt test",
     "dev": "./node_modules/.bin/grunt dev",
-    "build": "./node_modules/.bin/grunt build",
+    "_build": "./node_modules/.bin/grunt build",
     "preview": "./node_modules/.bin/grunt preview",
     "public": "./node_modules/.bin/grunt public"
   },
